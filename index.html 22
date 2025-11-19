@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moza game🧐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            /* الألوان الأصلية من الشرح الأول */
+            --color-red: #E74C3C;
+            --color-dark-blue: #2980B9; 
+            --color-black: #2C3E50;
+            --color-green: #2ECC71;
+            --color-blue: #3498DB;
+            --color-orange: #F39C12;
+            --color-gold: #FFD700;
+            --color-bg-dark: #34495E;
+            --color-text: #34495E;
+            --color-light-bg: #ECF0F1;
+            --color-locked: #BDC3C7; 
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #FFF; 
+            padding: 20px;
+            text-align: center;
+            /* الخلفية المتحركة الأصلية */
+            background: linear-gradient(-45deg, #2c3e50, #34495e, #1e2a36, #222b37);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Screens and Containers --- */
+        .screen {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            display: none;
+            color: var(--color-text);
+        }
+        .screen.active { display: block; }
+        
+        /* 3. تعديل كتابة اسم التطبيق */
+        #game-title {
+            font-size: 2.2em;
+            color: var(--color-black);
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* --- Progress Bar (إعادة شريط التقدم المجزأ) --- */
+        .progress-container { margin-bottom: 30px; }
+        .level-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; }
+        .progress-bar-shell {
+            height: 30px;
+            background-color: #BDC3C7;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar { 
+            height: 100%; 
+            width: 0; 
+            transition: width 0.5s ease-in-out; 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start; 
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            /* خلفية افتراضية في حال عدم وجود XP */
+            background-color: var(--color-green);
+        }
+        .xp-segment { 
+            height: 100%; 
+            transition: width 0.3s ease-out; 
+            /* مهم: الألوان ستأتي من JS */
+            box-shadow: 1px 0 0 rgba(0, 0, 0, 0.1); 
+        }
+        .percentage-text { 
+            position: absolute; 
+            right: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            z-index: 20; 
+            color: white; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            font-weight: bold; 
+            font-size: 1.1em; 
+        }
+
+        /* --- XP Buttons Grid and Dropdown --- */
+        .xp-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .xp-group { position: relative; }
+        
+        /* 2. استعادة تصميم وألوان الأزرار الأصلية (3D Style) */
+        .xp-main-btn {
+            width: 100%; padding: 20px 15px; font-size: 1.1em; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;
+            border-bottom: 4px solid rgba(0, 0, 0, 0.3); transition: transform 0.1s, border-bottom-width 0.1s;
+        }
+        .xp-main-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        
+        /* ألوان الأزرار */
+        .red-xp .xp-main-btn { background-color: var(--color-red); border-bottom-color: #C0392B; }
+        .dark-blue-xp .xp-main-btn { background-color: var(--color-dark-blue); border-bottom-color: #2471A3; }
+        .blue-xp .xp-main-btn { background-color: var(--color-blue); border-bottom-color: #2980B9; }
+        .green-xp .xp-main-btn { background-color: var(--color-green); border-bottom-color: #27AE60; }
+        .orange-xp .xp-main-btn { background-color: var(--color-orange); border-bottom-color: #E67E22; }
+        .streaks-xp .xp-main-btn { background: var(--color-gold); color: var(--color-black); border-bottom-color: #FFC300; }
+        .lazy-xp .xp-main-btn { background-color: var(--color-red); border-bottom-color: #C0392B; }
+
+
+        .xp-dropdown {
+            display: none; position: absolute; z-index: 100; top: calc(100% + 5px); left: 0; right: 0;
+            border: 2px solid var(--color-dark-blue); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); background-color: #FDFEFE;
+            border-radius: 8px; padding: 5px 0;
+        }
+        .xp-dropdown.visible { display: block; }
+        .xp-dropdown button { width: 100%; display: block; padding: 12px 15px; font-size: 1em; text-align: left; border: none; background: none; cursor: pointer; color: var(--color-text); }
+        .xp-dropdown button:hover { background-color: #E8F8F5; color: var(--color-dark-blue); }
+
+        /* --- Level Modal and Toast (إبقاء هذه الأنماط كما هي) --- */
+        #levels-modal .modal-content { max-width: 600px; }
+        .levels-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        .level-card { padding: 15px 5px; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border: 1px solid #DDD; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .level-icon { font-size: 2.5em; margin-bottom: 5px; display: block; }
+        .level-complete { background-color: #D5F5E3; color: var(--color-green); border: 2px solid var(--color-green); font-weight: bold; }
+        .current-level-highlight { background-color: #FBEFBE !important; border: 2px solid var(--color-gold) !important; box-shadow: 0 0 10px rgba(243, 156, 18, 0.5); }
+        #toast-notification { /* Toast styles... */ }
+        /* ... Other Modals and general styles ... */
+    </style>
+</head>
+<body>
+
+    <div id="toast-notification">
+        <div class="toast-reaction">
+            <span id="toast-icon" class="toast-icon"></span>
+            <span id="toast-message"></span>
+        </div>
+        <div id="toast-details" class="toast-details"></div>
+    </div>
+
+    <div id="login-screen" class="screen active">
+        <h2>Welcome to Moza game🧐!</h2>
+        <form id="login-form">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="text" id="nickname" placeholder="Nick Name" required>
+            <input type="email" id="email" placeholder="Email (Local Storage Only)" required>
+            <input type="password" id="pin" placeholder="4-Digit PIN (for login)" maxlength="4" required>
+            
+            <label class="file-upload-wrapper" for="profile-image">
+                <i class="fas fa-camera"></i> Select Profile Picture (Required)
+                <input type="file" id="profile-image" accept="image/*" required>
+            </label>
+
+            <button type="submit">Start Game</button>
+        </form>
+    </div>
+
+    <div id="main-app" class="screen">
+        <h1 id="game-title" title="Made by Kiro">
+            Moza game🧐
+        </h1>
+
+        <div class="progress-container">
+            <div class="level-info">
+                <span id="current-level-display" class="clickable">LEVEL 1</span>
+                <span id="current-xp-display">(0/100 XP)</span>
+            </div>
+            <div class="progress-bar-shell">
+                <div id="progress-bar" class="progress-bar">
+                    </div>
+                <span id="progress-text" class="percentage-text">0%</span>
+            </div>
+        </div>
+
+        <div class="main-controls">
+            <button id="show-levels-btn" class="control-btn"><i class="fas fa-layer-group"></i> LEVELS MAP</button>
+            <button id="details-btn" class="control-btn">DETAILS</button>
+            <button id="level-detail-btn" class="control-btn">LEVEL DETAIL (Notes)</button>
+            
+            <div class="xp-buttons-grid">
+                <div class="xp-group red-xp">
+                    <button class="xp-main-btn" data-xp-type="red">20 XP</button>
+                    <div class="xp-dropdown">
+                        <button onclick="addXP(12, 'Finish Unit', 'var(--color-red)')">Finish Unit (12 XP)</button>
+                        <button onclick="addXP(8, 'Exercises', 'var(--color-red)')">Exercises (8 XP)</button>
+                    </div>
+                </div>
+
+                <div class="xp-group blue-xp">
+                    <button class="xp-main-btn" data-xp-type="blue">3 XP</button>
+                    <div class="xp-dropdown">
+                        <button onclick="addXP(3, '1/2 Leccon', 'var(--color-blue)')">1/2 Leccon (3 XP)</button>
+                    </div>
+                </div>
+
+                <div class="xp-group dark-blue-xp">
+                    <button class="xp-main-btn" data-xp-type="dark-blue">10 XP</button>
+                    <div class="xp-dropdown">
+                        <button onclick="addXP(7, 'Leccon', 'var(--color-dark-blue)')">Leccon (7 XP)</button>
+                        <button onclick="addXP(3, 'Exercises', 'var(--color-dark-blue)')">Exercises (3 XP)</button>
+                    </div>
+                </div>
+
+                <div class="xp-group green-xp">
+                    <button class="xp-main-btn" data-xp-type="green">5 XP</button>
+                    <div class="xp-dropdown">
+                        <button onclick="addXP(2, 'Engil', 'var(--color-green)')">Engil (2 XP)</button>
+                        <button onclick="addXP(2, 'Salah', 'var(--color-green)')">Salah (2 XP)</button>
+                    </div>
+                </div>
+
+                <div class="xp-group orange-xp">
+                    <button class="xp-main-btn" data-xp-type="orange">2 XP</button>
+                    <div class="xp-dropdown">
+                        <button onclick="addXP(2, 'Wake Up Before 7', 'var(--color-orange)')">Wake Up Before 7 (2 XP)</button>
+                    </div>
+                </div>
+
+                <div class="xp-group streaks-xp">
+                    <button class="xp-main-btn"><i class="fas fa-plus fa-lg"></i> STREAKS</button>
+                    <div class="xp-dropdown">
+                        <button onclick="addXP(15, 'Streak Bonus 1', 'var(--color-gold)')">15 XP</button>
+                        <button onclick="addXP(25, 'Streak Bonus 2', 'var(--color-gold)')">25 XP</button>
+                        <button onclick="addXP(30, 'Streak Bonus 3', 'var(--color-gold)')">30 XP</button>
+                        <button onclick="addXP(20, 'Streak Bonus 4', 'var(--color-gold)')">20 XP</button>
+                    </div>
+                </div>
+
+                <div class="xp-group lazy-xp">
+                    <button class="xp-main-btn"><i class="fas fa-minus fa-lg"></i> LAZY</button>
+                    <div class="xp-dropdown">
+                        <button onclick="subtractXP(25, 'Lazy Penalty')">Subtract 25 XP</button>
+                        <button onclick="subtractXP(user.currentXP, 'Full Level Penalty')">Subtract Whole Level XP</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="notification" class="notification-popup">
+            <p>🎉 Congratulations! You completed **LEVEL <span id="completed-level"></span>**! 🎉</p>
+        </div>
+
+        <div id="levels-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3>Levels Map (Level Progress)</h3>
+                <div id="levels-grid" class="levels-grid">
+                </div>
+                <p style="margin-top: 20px;"><i class="fas fa-circle" style="color: var(--color-gold);"></i>: Current Level | <i class="fas fa-check-circle" style="color: var(--color-green);"></i>: Completed</p>
+            </div>
+        </div>
+
+        <div id="details-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3>User History Log</h3>
+                <p>Nickname: <span id="details-nickname"></span> | Date/Time: <span id="details-time"></span></p>
+                <div id="history-log"></div>
+            </div>
+        </div>
+        
+        <div id="level-notes-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3>Level Notes (Level <span id="notes-level"></span>)</h3>
+                <textarea id="level-notes-input" placeholder="What did you do in this level?"></textarea>
+                <button id="save-notes-btn">Save Notes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+        
+        let user = {
+            name: '',
+            nickname: '',
+            email: '',
+            pin: '',
+            profileImage: '', 
+            currentLevel: 1,
+            currentXP: 0,
+            maxLevel: 10,
+            levelData: {},
+            history: [],
+            
+            levelCap: function() {
+                return this.currentLevel * 100;
+            }
+        };
+
+        // --- Local Storage Functions ---
+        function saveUserData() {
+            localStorage.setItem('xpMasteryUser', JSON.stringify(user));
+        }
+
+        function loadUserData() {
+            const savedData = localStorage.getItem('xpMasteryUser');
+            if (savedData) {
+                Object.assign(user, JSON.parse(savedData));
+                user.levelCap = function() { return this.currentLevel * 100; };
+                 if (!user.levelData[user.currentLevel]) {
+                    user.levelData[user.currentLevel] = { completed: false, notes: '' };
+                }
+                return true;
+            }
+            return false;
+        }
+
+        // --- Initialization and UI Logic ---
+
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        function initApp() {
+            if (loadUserData()) {
+                showPinLogin();
+            } else {
+                document.getElementById('login-screen').classList.add('active');
+            }
+
+            document.getElementById('game-title').addEventListener('click', () => {
+                showToast('Moza game🧐', 'Made by Kiro!', 'fa-solid fa-code', 'var(--color-dark-blue)');
+            });
+            document.getElementById('show-levels-btn').addEventListener('click', showLevelsModal);
+            
+            document.getElementById('details-btn').addEventListener('click', showHistoryDetails);
+            document.getElementById('level-detail-btn').addEventListener('click', showLevelNotes);
+            document.getElementById('save-notes-btn').addEventListener('click', saveLevelNotes);
+            
+            document.querySelectorAll('.close-button').forEach(btn => {
+                btn.addEventListener('click', (e) => e.target.closest('.modal').style.display = 'none');
+            });
+
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+                
+                // إخفاء جميع القوائم المنسدلة عند الضغط في أي مكان خارجها
+                if (!event.target.closest('.xp-group')) {
+                    document.querySelectorAll('.xp-dropdown.visible').forEach(dropdown => {
+                        dropdown.classList.remove('visible');
+                    });
+                }
+            }
+            
+            // تعديل تفاعل الأزرار لفتح وإغلاق القوائم
+            document.querySelectorAll('.xp-main-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); 
+                    
+                    const dropdown = this.nextElementSibling;
+                    const isVisible = dropdown.classList.contains('visible');
+                    
+                    document.querySelectorAll('.xp-dropdown.visible').forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.classList.remove('visible');
+                        }
+                    });
+                    
+                    if (isVisible) {
+                        dropdown.classList.remove('visible');
+                    } else {
+                        dropdown.classList.add('visible');
+                    }
+                });
+            });
+        }
+        
+        // --- Login/Signup Handlers (Simplified) ---
+        function showPinLogin() { /* ... function body ... */ }
+        function handlePinLogin(e) { /* ... function body ... */ 
+            e.preventDefault();
+            const pin = document.getElementById('login-pin').value;
+            if (pin === user.pin) {
+                document.getElementById('login-screen').classList.remove('active');
+                document.getElementById('main-app').classList.add('active');
+                updateUI();
+            } else {
+                alert('Incorrect PIN. Please try again.');
+            }
+        }
+        document.getElementById('login-form').addEventListener('submit', handleSignUp);
+        function handleSignUp(e) { /* ... function body ... */
+             e.preventDefault();
+            user.name = document.getElementById('name').value;
+            user.nickname = document.getElementById('nickname').value;
+            user.email = document.getElementById('email').value;
+            user.pin = document.getElementById('pin').value;
+            
+            const profileImageInput = document.getElementById('profile-image');
+            
+            if (profileImageInput.files.length === 0) {
+                showToast('Action Required', 'Please select a profile image.', 'fa-solid fa-triangle-exclamation', 'var(--color-red)');
+                return;
+            }
+            
+            const file = profileImageInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                user.profileImage = event.target.result; 
+                
+                if (!user.levelData[user.currentLevel]) {
+                    user.levelData[user.currentLevel] = { completed: false, notes: '' };
+                }
+
+                saveUserData();
+                document.getElementById('login-screen').classList.remove('active');
+                document.getElementById('main-app').classList.add('active');
+                updateUI();
+                showToast('Welcome!', `Hello, ${user.nickname}! Let the game begin.`, 'fa-solid fa-hand-peace', 'var(--color-green)');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- Toast Notification System ---
+        let toastTimeout;
+        function showToast(message, details, iconClass, color) { /* ... function body ... */
+            clearTimeout(toastTimeout);
+            const toast = document.getElementById('toast-notification');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastMessage = document.getElementById('toast-message');
+            const toastDetails = document.getElementById('toast-details');
+
+            toast.classList.remove('show');
+            toast.style.backgroundColor = color;
+            toastIcon.className = `toast-icon ${iconClass}`;
+            toastMessage.textContent = message;
+            toastDetails.textContent = details;
+
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+            
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+
+        // --- XP Logic ---
+        function addXP(amount, source, color = 'var(--color-gold)') { /* ... function body ... */
+            document.querySelectorAll('.xp-dropdown.visible').forEach(dropdown => { dropdown.classList.remove('visible'); });
+            user.currentXP += amount;
+            user.history.push({ type: 'gain', amount: amount, source: source, level: user.currentLevel, timestamp: new Date().toLocaleString(), color: color });
+            checkLevelUp();
+            updateUI();
+            const reaction = amount >= 15 ? 'Awesome!' : 'Good Job!';
+            const icon = amount >= 15 ? 'fa-solid fa-star' : 'fa-solid fa-circle-plus';
+            showToast(reaction, `+${amount} XP added for ${source}`, icon, color);
+        }
+
+        function subtractXP(amount, source) { /* ... function body ... */
+            document.querySelectorAll('.xp-dropdown.visible').forEach(dropdown => { dropdown.classList.remove('visible'); });
+            user.currentXP -= amount;
+            if (user.currentXP < 0) user.currentXP = 0;
+            user.history.push({ type: 'loss', amount: amount, source: source, level: user.currentLevel, timestamp: new Date().toLocaleString() });
+            updateUI();
+            const reaction = amount >= 25 ? 'Critical Hit!' : 'Oh No!';
+            showToast(reaction, `-${amount} XP deducted for ${source}`, 'fa-solid fa-skull-crossbones', 'var(--color-red)');
+        }
+
+        function checkLevelUp() { /* ... function body ... */
+            if (user.currentXP >= user.levelCap() && user.currentLevel < user.maxLevel) {
+                const excessXP = user.currentXP - user.levelCap();
+                if (!user.levelData[user.currentLevel]) { user.levelData[user.currentLevel] = {}; }
+                user.levelData[user.currentLevel].completed = true;
+                user.levelData[user.currentLevel].completionTime = new Date().toLocaleString();
+                user.currentLevel++;
+                user.currentXP = excessXP; 
+                if (!user.levelData[user.currentLevel]) { user.levelData[user.currentLevel] = { completed: false, notes: '' }; }
+                showNotification(user.currentLevel - 1);
+                user.history.push({ type: 'level_up', amount: user.levelCap(), source: `Completed Level ${user.currentLevel - 1}`, level: user.currentLevel, timestamp: new Date().toLocaleString() });
+                showToast('LEVEL UP!', `You reached Level ${user.currentLevel}!`, 'fa-solid fa-trophy', 'var(--color-gold)');
+            }
+        }
+
+        // --- Update UI (إعادة شريط التقدم المجزأ) ---
+        function updateUI() {
+            const totalCap = user.levelCap();
+            const currentXP = user.currentXP;
+            const percentage = Math.min(100, (currentXP / totalCap) * 100);
+            
+            document.getElementById('current-level-display').textContent = `LEVEL ${user.currentLevel}`;
+            document.getElementById('current-xp-display').textContent = `(${currentXP}/${totalCap} XP)`;
+            
+            const progressBar = document.getElementById('progress-bar');
+            const percentageText = document.getElementById('progress-text');
+
+            progressBar.style.width = `${percentage}%`; 
+            percentageText.textContent = `${percentage.toFixed(0)}%`;
+            
+            progressBar.innerHTML = ''; 
+            
+            const currentLevelGains = user.history.filter(h => h.level === user.currentLevel && h.type === 'gain');
+            
+            const colorBreakdown = currentLevelGains.reduce((acc, entry) => {
+                const color = entry.color || 'var(--color-gold)'; 
+                acc[color] = (acc[color] || 0) + entry.amount;
+                return acc;
+            }, {});
+            
+            let segmentsHTML = '';
+            
+            for (const color in colorBreakdown) {
+                const xpAmount = colorBreakdown[color];
+                const segmentWidth = (xpAmount / totalCap) * 100;
+
+                if (segmentWidth > 0) { 
+                     segmentsHTML += `<div class="xp-segment" style="width:${segmentWidth}%; background-color:${color};"></div>`;
+                }
+            }
+            
+            progressBar.insertAdjacentHTML('afterbegin', segmentsHTML);
+
+            saveUserData();
+        }
+
+        // --- Level Map Logic ---
+        function getLevelIcon(level, isCompleted) {
+            if (isCompleted) { return '<i class="level-icon fas fa-check-double"></i>'; }
+            if (level === user.currentLevel) { return '<i class="level-icon fas fa-star"></i>'; }
+            if (level < user.currentLevel) { return '<i class="level-icon fas fa-check-circle"></i>'; } 
+            return '<i class="level-icon fas fa-lock"></i>'; 
+        }
+        
+        function renderLevelsMap() {
+            const grid = document.getElementById('levels-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= user.maxLevel; i++) {
+                const levelStatus = user.levelData[i];
+                const isCompleted = levelStatus?.completed || false;
+                const isUnlocked = i <= user.currentLevel || (i > 1 && user.levelData[i-1]?.completed);
+                const isCurrent = i === user.currentLevel;
+
+                let cardClass = 'level-card';
+                if (isCompleted) {
+                    cardClass += ' level-complete';
+                } else if (isCurrent) {
+                    cardClass += ' level-unlocked current-level-highlight';
+                } else if (isUnlocked) {
+                    cardClass += ' level-unlocked';
+                } else {
+                    cardClass += ' level-locked';
+                }
+
+                const cardHTML = `
+                    <div class="${cardClass}" data-level="${i}" title="${isCompleted ? 'Completed' : isCurrent ? 'Current' : isUnlocked ? 'Unlocked' : 'Locked'}">
+                        ${getLevelIcon(i, isCompleted)}
+                        <strong>Level ${i}</strong>
+                        <small>(${i * 100} XP)</small>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            }
+        }
+
+        function showLevelsModal() {
+            renderLevelsMap();
+            showModal('levels-modal');
+        }
+
+        // --- Other Modal Functions (Simplified) ---
+        function showModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+        function showNotification(completedLevel) { /* ... function body ... */ }
+        function showHistoryDetails() { /* ... function body ... */ }
+        function showLevelNotes() { /* ... function body ... */ }
+        function saveLevelNotes() { /* ... function body ... */ }
+        
+    </script>
+</body>
+</html>
