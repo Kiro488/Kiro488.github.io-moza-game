@@ -1,0 +1,827 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moza game </title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ---------------------------------- */
+        /* 2. CSS للتصميم والجمالية */
+        /* ---------------------------------- */
+        :root {
+            --color-red: #e74c3c;
+            --color-blue: #3498db;
+            --color-green: #2ecc71;
+            --color-orange: #f39c12;
+            --color-purple: #9b59b6;
+            --color-golden: #f1c40f;
+            --bg-dark: #2c3e50;
+        }
+
+        body {
+            background-color: #f4f7fa;
+            font-family: 'Poppins', sans-serif;
+            direction: rtl;
+            text-align: right;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 95%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: grid;
+            grid-template-columns: 3fr 1fr; /* تقسيم الواجهة كما في الرسم */
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* ----- Login Page ----- */
+        #login-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* ----- Header/Title Section ----- */
+        .header-section {
+            grid-column: 1 / 3;
+            text-align: center;
+        }
+
+        #game-name {
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
+            background: linear-gradient(90deg, var(--color-red), var(--bg-dark));
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        
+        /* ---------------------------------- */
+        /* 1. XP Bar & Level Display (المنطقة الحمراء) */
+        /* ---------------------------------- */
+        .xp-level-area {
+            grid-column: 1 / 3;
+            background-color: #ffe0b2;
+            border: 3px solid var(--color-red);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .xp-level-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        #level-display {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-red);
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 2px solid var(--color-red);
+            border-radius: 5px;
+        }
+        
+        /* XP Bar احترافي */
+        .xp-bar-wrapper {
+            position: relative;
+            height: 40px;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 0%;
+            /* تدرج احترافي */
+            background: linear-gradient(90deg, var(--color-blue) 0%, var(--color-purple) 100%);
+            transition: width 0.7s ease-in-out; 
+            display: flex;
+            flex-direction: row-reverse; /* لعرض الشرائط بترتيب */
+        }
+        
+        .xp-segment {
+            height: 100%;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+
+        .xp-segment-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--bg-dark);
+        }
+
+        .xp-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 16px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ----- User Info Section ----- */
+        .user-info-section {
+            grid-column: 2 / 3;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid var(--color-blue);
+        }
+
+        .user-info-section div {
+            padding: 5px 0;
+            border-bottom: 1px dotted #eee;
+            font-size: 14px;
+        }
+        
+        /* ----- Action Buttons (Details) Section ----- */
+        .details-section {
+            grid-column: 1 / 2;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn-group {
+            position: relative;
+            text-align: center;
+        }
+
+        .main-action-btn {
+            width: 100%;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+            color: white;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .red-btn { background-color: var(--color-red); }
+        .blue-btn { background-color: var(--color-blue); }
+        .purple-btn { background-color: var(--color-purple); }
+        .green-btn { background-color: var(--color-green); }
+        .orange-btn { background-color: var(--color-orange); }
+
+        /* Menu / Dropdown */
+        .action-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none;
+        }
+
+        .action-menu button {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px;
+            text-align: right;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .action-menu button:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* ----- Streak & Lazy Section ----- */
+        .streak-lazy-section {
+            grid-column: 1 / 3;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .streak-lazy-group {
+            width: 48%;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        
+        .streak-lazy-group h3 {
+            margin-top: 0;
+            cursor: pointer;
+        }
+
+        .streak-lazy-icon {
+            font-size: 24px;
+            font-weight: 900;
+            padding: 5px;
+            display: inline-block;
+            border-radius: 5px;
+        }
+
+        /* Streak */
+        .streak-group { background-color: #e8f5e9; }
+        .streak-group .streak-lazy-icon { 
+            color: white;
+            background-color: var(--color-green); 
+        }
+
+        /* Lazy */
+        .lazy-group { background-color: #fbecec; }
+        .lazy-group .streak-lazy-icon { 
+            color: white;
+            background-color: var(--color-red); 
+        }
+
+        /* Streak/Lazy Menu */
+        .s-l-menu {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none;
+            margin-bottom: 5px;
+            width: 150px;
+        }
+        
+        /* ----- Modals (Level & History) ----- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover, .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .level-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .level-locked {
+            background-color: #f8d7da;
+            color: #721c24;
+            pointer-events: none; /* لمنع النقر */
+        }
+
+        .level-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px dotted #ccc;
+            font-size: 14px;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div id="login-page">
+        <div class="login-box">
+            <h2>تسجيل الدخول - Kiro App</h2>
+            <form id="login-form">
+                <input type="text" id="login-name" placeholder="الاسم" required>
+                <input type="text" id="login-nickname" placeholder="الاسم المستعار (Nickname)" required>
+                <input type="email" id="login-email" placeholder="البريد الإلكتروني (Email)" required>
+                <input type="password" id="login-pin" placeholder="PIN (للدخول مستقبلاً)" required>
+                <button type="submit" class="action-btn blue-btn" style="margin-top: 15px;">دخول</button>
+            </form>
+            <p style="margin-top: 10px; font-size: 12px; color: #777;">لن يتم حفظ البيانات بشكل دائم بدون Backend.</p>
+        </div>
+    </div>
+
+    <div id="main-app" class="main-container" style="display: none;">
+
+        <div class="header-section">
+            <div id="game-name" onclick="showNotification('Made by Kiro')">Game Name</div>
+        </div>
+        
+        <div class="xp-level-area">
+            
+            <div class="xp-level-flex">
+                <div id="level-display" onclick="showLevelModal()">
+                    المستوى <span id="current-level-number">5</span>
+                </div>
+                
+                <div>
+                    <button class="main-action-btn blue-btn" style="width: auto; padding: 8px 12px; font-size: 14px;" onclick="showHistoryModal('details')">
+                        <i class="fas fa-list-alt"></i> Details
+                    </button>
+                    <button class="main-action-btn red-btn" style="width: auto; padding: 8px 12px; font-size: 14px; margin-left: 5px;" onclick="showHistoryModal('level-details')">
+                        <i class="fas fa-edit"></i> Level Detail
+                    </button>
+                </div>
+            </div>
+
+            <div class="xp-bar-wrapper">
+                <div id="xp-bar-fill" class="xp-bar-fill">
+                    </div>
+                <div class="xp-overlay">
+                    <span id="xp-counter">120 / 200 XP</span>
+                    <span id="xp-percentage" style="margin-right: 15px; font-size: 14px;">(60%)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h3 style="color: var(--color-purple); border-bottom: 2px solid var(--color-purple);">Details</h3>
+            
+            <div class="action-grid">
+                
+                <div class="action-btn-group">
+                    <button class="main-action-btn red-btn" onclick="toggleMenu('menu-1')">20 XP</button>
+                    <div id="menu-1" class="action-menu">
+                        <button onclick="addXPAction(12, 'Unit', 'red')">Finish Unit (+12 XP)</button>
+                        <button onclick="addXPAction(8, 'Exercises', 'red')">Exercises (+8 XP)</button>
+                    </div>
+                </div>
+
+                <div class="action-btn-group">
+                    <button class="main-action-btn blue-btn" onclick="toggleMenu('menu-2')">Lecon</button>
+                    <div id="menu-2" class="action-menu">
+                        <button onclick="addXPAction(7, 'Lecon', 'blue')">Lecon (+7 XP)</button>
+                        <button onclick="addXPAction(3, 'Exercises', 'blue')">Exercises (+3 XP)</button>
+                    </div>
+                </div>
+
+                <div class="action-btn-group">
+                    <button class="main-action-btn purple-btn" onclick="toggleMenu('menu-3')">3 XP</button>
+                    <div id="menu-3" class="action-menu">
+                        <button onclick="addXPAction(3, '1/2 Lecon', 'purple')">1/2 Lecon (+3 XP)</button>
+                    </div>
+                </div>
+
+                <div class="action-btn-group">
+                    <button class="main-action-btn green-btn" onclick="toggleMenu('menu-4')">5 XP</button>
+                    <div id="menu-4" class="action-menu">
+                        <button onclick="addXPAction(2, 'English', 'green')">English (+2 XP)</button>
+                        <button onclick="addXPAction(2, 'Salah', 'green')">Salah (+2 XP)</button>
+                    </div>
+                </div>
+
+                <div class="action-btn-group">
+                    <button class="main-action-btn orange-btn" onclick="toggleMenu('menu-5')">2 XP</button>
+                    <div id="menu-5" class="action-menu">
+                        <button onclick="addXPAction(2, 'Wake Up', 'orange')">Wake Up before 7 (+2 XP)</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="user-info-section">
+            <h3 style="color: var(--color-blue); margin-top: 0;">User Info</h3>
+            <div id="user-photo">
+                <i class="fas fa-user-circle fa-2x" style="color: var(--color-blue);"></i>
+            </div>
+            <div><i class="fas fa-signature"></i> **الاسم:** <span id="info-name">--</span></div>
+            <div><i class="fas fa-user-tag"></i> **الاسم المستعار:** <span id="info-nickname">--</span></div>
+            <div><i class="fas fa-clock"></i> **الوقت/التاريخ:** <span id="info-time">--</span></div>
+        </div>
+
+        <div class="streak-lazy-section">
+            
+            <div class="streak-lazy-group streak-group">
+                <h3 onclick="toggleMenu('streak-menu')">
+                    Streak <span class="streak-lazy-icon">+</span>
+                </h3>
+                <div id="streak-menu" class="s-l-menu">
+                    <button onclick="addXPAction(15, 'Streak Bonus', 'golden', true)">15 XP Bonus</button>
+                    <button onclick="addXPAction(25, 'Streak Bonus', 'golden', true)">25 XP Bonus</button>
+                    <button onclick="addXPAction(30, 'Streak Bonus', 'golden', true)">30 XP Bonus</button>
+                    <button onclick="addXPAction(20, 'Streak Bonus', 'golden', true)">20 XP Bonus</button>
+                </div>
+            </div>
+
+            <div class="streak-lazy-group lazy-group">
+                <h3 onclick="toggleMenu('lazy-menu')">
+                    Lazy <span class="streak-lazy-icon">-</span>
+                </h3>
+                <div id="lazy-menu" class="s-l-menu">
+                    <button onclick="removeXPAction(25, 'Lazy Penalty', 'red')">-25 XP Penalty</button>
+                    <button onclick="removeXPAction(currentXP, 'Full Level Reset', 'red')">Level Reset!</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div id="level-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('level-modal').style.display='none'">&times;</span>
+            <h2>قائمة المستويات المتاحة</h2>
+            <div id="levels-list">
+                </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('history-modal').style.display='none'">&times;</span>
+            <h2 id="history-modal-title">سجل الإنجازات (Details)</h2>
+            <div id="history-content">
+                </div>
+        </div>
+    </div>
+    
+    <div id="notification-popup" class="notification-popup"></div>
+
+    <script>
+        /* ---------------------------------- */
+        /* 3. JavaScript للوظائف والتفاعل */
+        /* ---------------------------------- */
+
+        // القيم الافتراضية
+        let currentXP = 50; // يبدأ بـ 50 XP
+        let currentLevel = 1; 
+        const MAX_LEVELS = 10;
+        let xpHistory = [];
+        let userData = {};
+
+        // الأهداف المطلوبة لكل مستوى
+        function getXPNeeded(level) {
+            return level * 100; // المستوى 1: 100، المستوى 2: 200، الخ.
+        }
+
+        let xpNeeded = getXPNeeded(currentLevel);
+
+        const elements = {
+            loginPage: document.getElementById('login-page'),
+            mainApp: document.getElementById('main-app'),
+            loginForm: document.getElementById('login-form'),
+            xpBarFill: document.getElementById('xp-bar-fill'),
+            xpCounter: document.getElementById('xp-counter'),
+            xpPercentage: document.getElementById('xp-percentage'),
+            levelNumber: document.getElementById('current-level-number'),
+            levelModal: document.getElementById('level-modal'),
+            historyModal: document.getElementById('history-modal'),
+            historyModalTitle: document.getElementById('history-modal-title'),
+            historyContent: document.getElementById('history-content'),
+            notificationPopup: document.getElementById('notification-popup'),
+        };
+
+        // ---------------------------------
+        // LOGIN/User Info Logic
+        // ---------------------------------
+        elements.loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const pin = document.getElementById('login-pin').value;
+            // التحقق من PIN (يحاكي عملية تحقق بسيطة)
+            if (pin.length < 4) {
+                 showNotification("PIN يجب أن يكون 4 خانات على الأقل!", 'red');
+                 return;
+            }
+
+            // حفظ بيانات المستخدم محلياً (لن تستمر بعد إغلاق المتصفح)
+            userData = {
+                name: document.getElementById('login-name').value,
+                nickname: document.getElementById('login-nickname').value,
+                email: document.getElementById('login-email').value,
+                pin: pin,
+                loginTime: new Date().toLocaleString('ar-EG', {hour12: false}),
+            };
+
+            // تحديث واجهة المستخدم
+            document.getElementById('info-name').textContent = userData.name;
+            document.getElementById('info-nickname').textContent = userData.nickname;
+            document.getElementById('info-time').textContent = userData.loginTime;
+
+            // إخفاء صفحة الدخول وعرض التطبيق الرئيسي
+            elements.loginPage.style.display = 'none';
+            elements.mainApp.style.display = 'grid';
+            
+            // إرسال البيانات إلى السيرفر (وظيفة محاكاة فقط)
+            console.log("تم إرسال بيانات المستخدم إلى الإيميل: " + userData.email);
+            showNotification(`أهلا بك، ${userData.nickname}!`, 'blue');
+            updateUI();
+        });
+
+        // ---------------------------------
+        // XP/Level Logic
+        // ---------------------------------
+
+        function updateXPBar() {
+            const percentage = (currentXP / xpNeeded) * 100;
+            elements.xpBarFill.style.width = `${Math.min(100, percentage)}%`;
+            elements.xpCounter.textContent = `${currentXP} / ${xpNeeded} XP`;
+            elements.xpPercentage.textContent = `(${percentage.toFixed(0)}%)`;
+            
+            // عرض الشرائط المكتسبة
+            renderXPSegments();
+        }
+
+        function renderXPSegments() {
+            elements.xpBarFill.innerHTML = '';
+            
+            const totalWidth = parseFloat(elements.xpBarFill.style.width); // العرض الحالي
+            let currentXPSum = 0;
+            
+            // تصفية السجل الحالي فقط
+            const currentLevelHistory = xpHistory.filter(item => item.level === currentLevel);
+
+            currentLevelHistory.forEach(item => {
+                const itemWidth = (item.amount / xpNeeded) * 100;
+                
+                // يجب ألا يتجاوز مجموع الشرائط الـ 100%
+                if (currentXPSum + itemWidth <= totalWidth) {
+                    const segment = document.createElement('div');
+                    segment.className = 'xp-segment';
+                    segment.style.width = `${itemWidth}%`;
+                    segment.style.backgroundColor = item.color; // لون الإنجاز
+                    
+                    // Label (ظهور اسم الإنجاز عند النقر على الشريط)
+                    const label = document.createElement('span');
+                    label.className = 'xp-segment-label';
+                    label.textContent = item.task;
+                    // segment.appendChild(label); // يمكن تفعيل هذا إذا كان الشريط عريضاً
+
+                    elements.xpBarFill.appendChild(segment);
+                    currentXPSum += itemWidth;
+                }
+            });
+        }
+        
+        function addXPAction(amount, taskName, color, isBonus = false) {
+            currentXP += amount;
+            xpHistory.push({
+                type: 'XP+',
+                task: taskName,
+                amount: amount,
+                color: color,
+                level: currentLevel,
+                timestamp: new Date().toLocaleString('ar-EG', {hour12: false}),
+            });
+            
+            showNotification(`+${amount} XP: تم إنجاز ${taskName}`, color);
+            
+            // محاكاة إرسال الإيميل (Backend)
+            console.log(`Email Sent: +${amount} XP | Task: ${taskName}`);
+
+            updateUI();
+            
+            if (currentXP >= xpNeeded) {
+                // الانتظار قليلاً لإعطاء انطباع امتلاء الشريط
+                setTimeout(levelUp, 700); 
+            }
+        }
+        
+        function removeXPAction(amount, taskName, color) {
+            currentXP = Math.max(0, currentXP - amount); // XP لا يمكن أن يكون سالباً
+            
+            xpHistory.push({
+                type: 'XP-',
+                task: taskName,
+                amount: -amount,
+                color: color,
+                level: currentLevel,
+                timestamp: new Date().toLocaleString('ar-EG', {hour12: false}),
+            });
+            
+            showNotification(`-${amount} XP: ${taskName}`, color);
+            console.log(`Email Sent: -${amount} XP | Task: ${taskName}`);
+            updateUI();
+        }
+
+        function levelUp() {
+            // تسجيل المستوى الحالي على أنه مكتمل
+            xpHistory.push({
+                type: 'Level Completed',
+                task: `المستوى ${currentLevel} مكتمل`,
+                amount: xpNeeded,
+                color: 'var(--color-green)',
+                level: currentLevel,
+                timestamp: new Date().toLocaleString('ar-EG', {hour12: false}),
+            });
+            
+            const remainingXP = currentXP - xpNeeded;
+            currentLevel++;
+            currentXP = remainingXP;
+            xpNeeded = getXPNeeded(currentLevel); 
+            
+            // تحديث المستوى وعرضه
+            elements.levelNumber.textContent = currentLevel;
+            
+            // تفعيل مؤثر Level Up
+            elements.levelNumber.classList.add('level-up-glow');
+            setTimeout(() => {
+                elements.levelNumber.classList.remove('level-up-glow');
+            }, 1500);
+
+            showNotification(`🎉 تهانينا! وصلت إلى المستوى ${currentLevel}!`, 'golden');
+            console.log(`Email Sent: Level Up to ${currentLevel}`);
+
+            // تحديث الشريط للمستوى الجديد
+            updateUI();
+        }
+        
+        function updateUI() {
+            updateXPBar();
+            elements.levelNumber.textContent = currentLevel;
+        }
+
+        // ---------------------------------
+        // Modals & Menus Logic
+        // ---------------------------------
+        function showNotification(message, color = 'blue') {
+            const popup = elements.notificationPopup;
+            popup.textContent = message;
+            popup.style.backgroundColor = `var(--color-${color})`;
+            
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+        
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const isVisible = menu.style.display === 'block';
+            
+            // إخفاء جميع القوائم أولاً
+            document.querySelectorAll('.action-menu, .s-l-menu').forEach(m => m.style.display = 'none');
+            
+            // عرض القائمة المطلوبة إذا لم تكن مرئية
+            if (!isVisible) {
+                menu.style.display = 'block';
+            }
+        }
+        
+        function showLevelModal() {
+            const list = document.getElementById('levels-list');
+            list.innerHTML = ''; // تفريغ القائمة
+            
+            for (let i = 1; i <= MAX_LEVELS; i++) {
+                const item = document.createElement('div');
+                item.className = 'level-item';
+                item.innerHTML = `<span><i class="fas fa-medal"></i> المستوى ${i} (XP: ${getXPNeeded(i)})</span>`;
+                
+                if (i <= currentLevel) {
+                    // المستوى مكتمل ويمكن الدخول إليه (للرؤية فقط)
+                    item.classList.add('level-completed');
+                    item.innerHTML += '<i class="fas fa-check-circle"></i>';
+                    item.onclick = () => { alert(`عرض تفاصيل المستوى ${i} المكتمل`); };
+                } else {
+                    // المستوى مغلق ويحتاج لإكمال السابق
+                    item.classList.add('level-locked');
+                    item.innerHTML += '<i class="fas fa-lock"></i>';
+                }
+                
+                list.appendChild(item);
+            }
+            elements.levelModal.style.display = 'block';
+        }
+        
+        function showHistoryModal(type) {
+            elements.historyContent.innerHTML = '';
+            
+            if (type === 'details') {
+                elements.historyModalTitle.textContent = "سجل الإنجازات (Details)";
+                xpHistory.slice().reverse().forEach(item => { // عرض الأحدث أولاً
+                    const hItem = document.createElement('div');
+                    hItem.className = 'history-item';
+                    let icon = item.type === 'XP+' ? 'plus' : (item.type === 'XP-' ? 'minus' : 'trophy');
+                    hItem.innerHTML = `<i class="fas fa-${icon}" style="color: var(--color-blue); margin-left: 5px;"></i> 
+                        **${item.task}** | الكمية: ${item.amount} XP | المستوى: ${item.level} | الوقت: ${item.timestamp}`;
+                    elements.historyContent.appendChild(hItem);
+                });
+            } else if (type === 'level-details') {
+                elements.historyModalTitle.textContent = "Level Detail (ملاحظات المستخدم)";
+                elements.historyContent.innerHTML = `<textarea rows="10" cols="50" style="width: 100%; resize: none; border-radius: 5px; padding: 10px;">اكتب ملاحظاتك عن هذا المستوى هنا...</textarea>
+                    <button class="main-action-btn green-btn" style="margin-top: 10px;">حفظ الملاحظات</button>`;
+            }
+
+            elements.historyModal.style.display = 'block';
+        }
+
+        // إغلاق المودال بالنقر خارجها
+        window.onclick = function(event) {
+            if (event.target == elements.levelModal) {
+                elements.levelModal.style.display = "none";
+            }
+            if (event.target == elements.historyModal) {
+                elements.historyModal.style.display = "none";
+            }
+        }
+        
+        // تشغيل البداية
+        document.addEventListener('DOMContentLoaded', updateUI);
+
+    </script>
+</body>
+</html>
+
